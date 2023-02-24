@@ -34,6 +34,9 @@ import yaml
 from torch.optim import lr_scheduler
 from tqdm import tqdm
 
+import mlflow
+
+
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
@@ -72,6 +75,9 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
         Path(opt.save_dir), opt.epochs, opt.batch_size, opt.weights, opt.single_cls, opt.evolve, opt.data, opt.cfg, \
         opt.resume, opt.noval, opt.nosave, opt.workers, opt.freeze
     callbacks.run('on_pretrain_routine_start')
+
+    mlflow.log_metric("epochs", epochs)
+    mlflow.log_metric("batch_size", batch_size)
 
     # Directories
     w = save_dir / 'weights'  # weights dir
@@ -636,5 +642,10 @@ def run(**kwargs):
 
 
 if __name__ == '__main__':
+    mlflow.start_run()
+    mlflow.set_tracking_uri("azureml://centralindia.api.azureml.ms/mlflow/v1.0/subscriptions/0be457fb-a98f-4eb0-9959-3980673755e7/resourceGroups/sasi2jay-rg/providers/Microsoft.MachineLearningServices/workspaces/demo_workspace")
+    run_id = mlflow.active_run().info.run_id
+    mlflow.log_param("run_id", run_id)
     opt = parse_opt()
     main(opt)
+    mlflow.end_run()
