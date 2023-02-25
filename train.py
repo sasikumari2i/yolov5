@@ -69,6 +69,8 @@ RANK = int(os.getenv('RANK', -1))
 WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
 GIT_INFO = check_git_info()
 
+mlflow.set_tracking_uri("azureml://centralindia.api.azureml.ms/mlflow/v1.0/subscriptions/0be457fb-a98f-4eb0-9959-3980673755e7/resourceGroups/sasi2jay-rg/providers/Microsoft.MachineLearningServices/workspaces/demo_workspace")
+
 
 def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictionary
     save_dir, epochs, batch_size, weights, single_cls, evolve, data, cfg, resume, noval, nosave, workers, freeze = \
@@ -643,8 +645,8 @@ def run(**kwargs):
 
 if __name__ == '__main__':
     mlflow.start_run()
-    mlflow.set_tracking_uri("azureml://centralindia.api.azureml.ms/mlflow/v1.0/subscriptions/0be457fb-a98f-4eb0-9959-3980673755e7/resourceGroups/sasi2jay-rg/providers/Microsoft.MachineLearningServices/workspaces/demo_workspace")
     run_id = mlflow.active_run().info.run_id
+    print("Run IDDDDDDDDDDD>>>>>>>>>>>>>>>>>>>> : ", run_id)
     mlflow.log_param("run_id", run_id)
     opt = parse_opt()
     main(opt)
