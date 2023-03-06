@@ -2,7 +2,6 @@
 """
 Dataloaders and dataset utils
 """
-
 import contextlib
 import glob
 import hashlib
@@ -17,9 +16,10 @@ from multiprocessing.pool import Pool, ThreadPool
 from pathlib import Path
 from threading import Thread
 from urllib.parse import urlparse
-
+import mlflow
 import numpy as np
 import psutil
+from pathlib import Path
 import torch
 import torch.nn.functional as F
 import torchvision
@@ -27,13 +27,18 @@ import yaml
 from PIL import ExifTags, Image, ImageOps
 from torch.utils.data import DataLoader, Dataset, dataloader, distributed
 from tqdm import tqdm
-
+import re
 from utils.augmentations import (Albumentations, augment_hsv, classify_albumentations, classify_transforms, copy_paste,
                                  letterbox, mixup, random_perspective)
 from utils.general import (DATASETS_DIR, LOGGER, NUM_THREADS, TQDM_BAR_FORMAT, check_dataset, check_requirements,
                            check_yaml, clean_str, cv2, is_colab, is_kaggle, segments2boxes, unzip_file, xyn2xy,
                            xywh2xyxy, xywhn2xyxy, xyxy2xywhn)
 from utils.torch_utils import torch_distributed_zero_first
+import logging
+
+# set up the logger
+logging.basicConfig(filename='exceptions.log', filemode='w', level=logging.ERROR)
+
 
 # Parameters
 HELP_URL = 'See https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
@@ -425,6 +430,22 @@ class LoadStreams:
         return len(self.sources)  # 1E12 frames = 32 streams at 30 FPS for 30 years
 
 
+def move_corrupt_files(path,path1):
+    with open('warnings.txt', 'r') as file:
+        for line in file:
+            line=line.rstrip('\n')
+            # print(line)
+            shutil.move(line, path)
+            line=line.replace('images','labels')
+            line=line.split('.')
+            label_extn='.txt'
+            label=line[0]+label_extn
+            # print(label)
+            shutil.move(label,path1)
+    mlflow.log_artifact('warnings.txt',artifact_path='data_info')
+    os.remove('warnings.txt')
+
+
 def img2label_paths(img_paths):
     # Define label paths as a function of image paths
     sa, sb = f'{os.sep}images{os.sep}', f'{os.sep}labels{os.sep}'  # /images/, /labels/ substrings
@@ -497,7 +518,35 @@ class LoadImagesAndLabels(Dataset):
         if exists and LOCAL_RANK in {-1, 0}:
             d = f"Scanning {cache_path}... {nf} images, {nm + ne} backgrounds, {nc} corrupt"
             tqdm(None, desc=prefix + d, total=n, initial=n, bar_format=TQDM_BAR_FORMAT)  # display cache results
+            filtered_msgs=[]
             if cache['msgs']:
+                print(cache['msgs'])
+                for i in range(len(cache['msgs'])):
+                    warning_index = cache['msgs'][i].find("WARNING")
+                    if warning_index != -1:
+                        filtered_msgs.append(cache['msgs'][i][warning_index:])
+                # print(filtered_msgs)
+                corrupt_images=[x for x in filtered_msgs if "corrupt image/label" in x]
+                # print(corrupt_images)
+
+                with open("warnings.txt",'w') as fp:
+
+                    for string in corrupt_images:
+                        string = string.replace("'", "")
+                        strings=string.rsplit('.',1)
+                        # print(strings[1])
+                        pattern = r"(/[^\s]+\.)"
+                        match = re.search(pattern, string)
+                        if match:
+                            path = match.group(1)
+                            path=(path+strings[1])
+                            fp.write(path)
+                            fp.write('\n')
+                        else:
+                            print("Path not found in string.")
+                Path('/home/karthik/yolov5/corrupt_data/images').mkdir(parents=True, exist_ok=True)
+                Path('/home/karthik/yolov5/corrupt_data/labels').mkdir(parents=True, exist_ok=True)
+                move_corrupt_files('/home/karthik/yolov5/corrupt_data/images','/home/karthik/yolov5/corrupt_data/labels')
                 LOGGER.info('\n'.join(cache['msgs']))  # display warnings
         assert nf > 0 or not augment, f'{prefix}No labels found in {cache_path}, can not start training. {HELP_URL}'
 
@@ -627,6 +676,9 @@ class LoadImagesAndLabels(Dataset):
         pbar.close()
         if msgs:
             LOGGER.info('\n'.join(msgs))
+
+
+
         if nf == 0:
             LOGGER.warning(f'{prefix}WARNING ⚠️ No labels found in {path}. {HELP_URL}')
         x['hash'] = get_hash(self.label_files + self.im_files)
@@ -1036,6 +1088,7 @@ def verify_image_label(args):
     except Exception as e:
         nc = 1
         msg = f'{prefix}WARNING ⚠️ {im_file}: ignoring corrupt image/label: {e}'
+        logging.exception(msg)
         return [None, None, None, None, nm, nf, ne, nc, msg]
 
 

@@ -9,7 +9,7 @@ import os
 from copy import copy
 from pathlib import Path
 from urllib.error import URLError
-
+import mlflow
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
@@ -304,7 +304,8 @@ def plot_lr_scheduler(optimizer, scheduler, epochs=300, save_dir=''):
     plt.grid()
     plt.xlim(0, epochs)
     plt.ylim(0)
-    plt.savefig(Path(save_dir) / 'LR.png', dpi=200)
+    plt.savefig(Path(save_dir) / 'Detector_LR.png', dpi=200)
+    mlflow.log_artifact(Path(save_dir) / 'Detector_LR.png', artifact_path="plots")
     plt.close()
 
 
@@ -317,12 +318,14 @@ def plot_val_txt():  # from utils.plots import *; plot_val()
     fig, ax = plt.subplots(1, 1, figsize=(6, 6), tight_layout=True)
     ax.hist2d(cx, cy, bins=600, cmax=10, cmin=0)
     ax.set_aspect('equal')
-    plt.savefig('hist2d.png', dpi=300)
+    plt.savefig('Detector_hist2d.png', dpi=300)
+    mlflow.log_artifact( 'Detector_hist2d.png', artifact_path="plots")
 
     fig, ax = plt.subplots(1, 2, figsize=(12, 6), tight_layout=True)
     ax[0].hist(cx, bins=600)
     ax[1].hist(cy, bins=600)
     plt.savefig('hist1d.png', dpi=200)
+    mlflow.log_artifact('Detector_hist1d.png', artifact_path="plots")
 
 
 def plot_targets_txt():  # from utils.plots import *; plot_targets_txt()
@@ -336,6 +339,7 @@ def plot_targets_txt():  # from utils.plots import *; plot_targets_txt()
         ax[i].legend()
         ax[i].set_title(s[i])
     plt.savefig('targets.jpg', dpi=200)
+    mlflow.log_artifact('Detector_targets.jpg', artifact_path="plots")
 
 
 def plot_val_study(file='', dir='', x=None):  # from utils.plots import *; plot_val_study()
@@ -378,9 +382,10 @@ def plot_val_study(file='', dir='', x=None):  # from utils.plots import *; plot_
     ax2.set_xlabel('GPU Speed (ms/img)')
     ax2.set_ylabel('COCO AP val')
     ax2.legend(loc='lower right')
-    f = save_dir / 'study.png'
+    f = save_dir / 'Detector_study.png'
     print(f'Saving {f}...')
     plt.savefig(f, dpi=300)
+    mlflow.log_artifact(f, artifact_path="plots")
 
 
 @TryExcept()  # known issue https://github.com/ultralytics/yolov5/issues/5395
@@ -393,7 +398,8 @@ def plot_labels(labels, names=(), save_dir=Path('')):
 
     # seaborn correlogram
     sn.pairplot(x, corner=True, diag_kind='auto', kind='hist', diag_kws=dict(bins=50), plot_kws=dict(pmax=0.9))
-    plt.savefig(save_dir / 'labels_correlogram.jpg', dpi=200)
+    plt.savefig(save_dir / 'Detector_labels_correlogram.jpg', dpi=200)
+    mlflow.log_artifact(save_dir / 'Detector_labels_correlogram.jpg', artifact_path="plots")
     plt.close()
 
     # matplotlib labels
@@ -424,8 +430,9 @@ def plot_labels(labels, names=(), save_dir=Path('')):
         for s in ['top', 'right', 'left', 'bottom']:
             ax[a].spines[s].set_visible(False)
 
-    plt.savefig(save_dir / 'labels.jpg', dpi=200)
+    plt.savefig(save_dir / 'Detector_labels.jpg', dpi=200)
     matplotlib.use('Agg')
+    mlflow.log_artifact(save_dir / 'Detector_labels.jpg', artifact_path="plots")
     plt.close()
 
 
@@ -448,6 +455,7 @@ def imshow_cls(im, labels=None, pred=None, names=None, nmax=25, verbose=False, f
             s = names[labels[i]] + (f'—{names[pred[i]]}' if pred is not None else '')
             ax[i].set_title(s, fontsize=8, verticalalignment='top')
     plt.savefig(f, dpi=300, bbox_inches='tight')
+    mlflow.log_artifact(f, artifact_path="plots")
     plt.close()
     if verbose:
         LOGGER.info(f"Saving {f}")
@@ -507,7 +515,8 @@ def plot_results(file='path/to/results.csv', dir=''):
         except Exception as e:
             LOGGER.info(f'Warning: Plotting error for {f}: {e}')
     ax[1].legend()
-    fig.savefig(save_dir / 'results.png', dpi=200)
+    fig.savefig(save_dir / 'Detector_results.png', dpi=200)
+    mlflow.log_artifact(save_dir / 'Detector_results.png', artifact_path="plots")
     plt.close()
 
 
@@ -540,6 +549,7 @@ def profile_idetection(start=0, stop=0, labels=(), save_dir=''):
             print(f'Warning: Plotting error for {f}; {e}')
     ax[1].legend()
     plt.savefig(Path(save_dir) / 'idetection_profile.png', dpi=200)
+    mlflow.log_artifact(Path(save_dir) / 'idetection_profile.png', artifact_path='plots')
 
 
 def save_one_box(xyxy, im, file=Path('im.jpg'), gain=1.02, pad=10, square=False, BGR=False, save=True):

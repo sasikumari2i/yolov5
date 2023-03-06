@@ -6,7 +6,7 @@ Model validation metrics
 import math
 import warnings
 from pathlib import Path
-
+import mlflow
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -212,6 +212,7 @@ class ConfusionMatrix:
         ax.set_ylabel('Predicted')
         ax.set_title('Confusion Matrix')
         fig.savefig(Path(save_dir) / 'confusion_matrix.png', dpi=250)
+        mlflow.log_artifact(Path(save_dir) / 'detector_confuison_matrix.png', artifact_path='plots')
         plt.close(fig)
 
     def print(self):
@@ -334,6 +335,7 @@ def plot_pr_curve(px, py, ap, save_dir=Path('pr_curve.png'), names=()):
     ax.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     ax.set_title('Precision-Recall Curve')
     fig.savefig(save_dir, dpi=250)
+    mlflow.log_artifact(save_dir, artifact_path='plots')
     plt.close(fig)
 
 
@@ -357,4 +359,5 @@ def plot_mc_curve(px, py, save_dir=Path('mc_curve.png'), names=(), xlabel='Confi
     ax.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     ax.set_title(f'{ylabel}-Confidence Curve')
     fig.savefig(save_dir, dpi=250)
+    mlflow.log_artifact(save_dir, artifact_path='plots')
     plt.close(fig)
