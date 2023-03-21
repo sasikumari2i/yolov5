@@ -1057,13 +1057,13 @@ def run(**kwargs):
 
 if __name__ == "__main__":
     opt = parse_opt()
-    mlflow_data=''
-    with open(opt.mlflow_setting, 'r') as f:
-        mlflow_data = json.load(f)
-    mlflow.set_tracking_uri("http://127.0.0.1:5000")
-    experiment = mlflow_data['experiment_name']
-    run_id=mlflow_data['run_id']
-    mlflow.start_run()
-    main(opt)
-    mlflow.end_run()
+    # mlflow_data=''
+    # with open(opt.mlflow_setting, 'r') as f:
+    #     mlflow_data = json.load(f)
+    mlflow.set_tracking_uri("azureml://centralindia.api.azureml.ms/mlflow/v1.0/subscriptions/4a42dfbb-6fb1-4ec4-88f7-c184e7892656/resourceGroups/ML_Studio_UAT/providers/Microsoft.MachineLearningServices/workspaces/Castle_1")
+    # experiment = mlflow_data['experiment_name']
+    # run_id=mlflow_data['run_id']
+    with mlflow.start_run(run_name='trial1'):
+        main(opt)
+    # mlflow.end_run()
 
