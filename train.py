@@ -152,7 +152,7 @@ def train(hyp, opt, device, callbacks):
         callbacks.run("on_pretrain_routine_start")
 
         # Directories
-        w = save_dir / "weights"  # weights dir
+        w = save_dir +  "/weights"  # weights dir
         (w.parent if evolve else w).mkdir(parents=True, exist_ok=True)  # make dir
         last, best = w / "last.pt", w / "best.pt"
 
