@@ -629,9 +629,9 @@ def train(hyp, opt, device, callbacks):
                     callbacks.run(
                         "on_model_save", last, epoch, final_epoch, best_fitness, fi
                     )
-                    print("Path Object>>>>>>>>>>>>>>>>>>>>>>")
-                    print(w)
-                    mlflow.log_artifact(w)
+                    # print("Path Object>>>>>>>>>>>>>>>>>>>>>>")
+                    # print(w)
+                    # mlflow.log_artifact(w)
 
             # EarlyStopping
             if RANK != -1:  # if DDP training
