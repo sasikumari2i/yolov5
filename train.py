@@ -683,7 +683,7 @@ def train(hyp, opt, device, callbacks):
 
             callbacks.run("on_train_end", last, best, epoch, results)
 
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
 
         return results
 
