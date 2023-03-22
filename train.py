@@ -631,7 +631,7 @@ def train(hyp, opt, device, callbacks):
                     )
                     print("Path Object>>>>>>>>>>>>>>>>>>>>>>")
                     print(w)
-                    mlflow.log_artifact(w)
+                    mlflow.log_artifacts(w)
 
             # EarlyStopping
             if RANK != -1:  # if DDP training
