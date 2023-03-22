@@ -629,7 +629,7 @@ def train(hyp, opt, device, callbacks):
                     callbacks.run(
                         "on_model_save", last, epoch, final_epoch, best_fitness, fi
                     )
-                    mlflow.log_artifact("weights_path", w)
+                    mlflow.log_artifact(w)
 
             # EarlyStopping
             if RANK != -1:  # if DDP training
