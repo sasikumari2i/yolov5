@@ -683,13 +683,14 @@ def train(hyp, opt, device, callbacks):
 
             callbacks.run("on_train_end", last, best, epoch, results)
 
-        # torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
 
         return results
 
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
+    parser.add_argument("--mlflow_file", type=str, help= "mlflow settings file")
     parser.add_argument(
         "--weights", type=str, default=ROOT / "yolov5n.pt", help="initial weights path"
     )
@@ -1060,12 +1061,15 @@ def run(**kwargs):
 if __name__ == "__main__":
     opt = parse_opt()
     # mlflow_data=''
-    # with open(opt.mlflow_setting, 'r') as f:
-    #     mlflow_data = json.load(f)
-    mlflow.set_tracking_uri("azureml://centralindia.api.azureml.ms/mlflow/v1.0/subscriptions/4a42dfbb-6fb1-4ec4-88f7-c184e7892656/resourceGroups/ML_Studio_UAT/providers/Microsoft.MachineLearningServices/workspaces/Castle_1")
+    with open(opt.mlflow_file, 'r') as f:
+        mlflow_data = f.read()
+    mlflow_settings_dict = json.loads(mlflow_data)
+    run_id = mlflow_settings_dict['run_id']
+    mlflow_uri = mlflow_settings_dict['mlflow_uri']
+    mlflow.set_tracking_uri(mlflow_uri)
     # experiment = mlflow_data['experiment_name']
     # run_id=mlflow_data['run_id']
-    with mlflow.start_run(run_name='trial1'):
+    with mlflow.start_run(run_id=run_id):
         main(opt)
     # mlflow.end_run()
 
