@@ -1058,7 +1058,6 @@ def run(**kwargs):
 
 if __name__ == "__main__":
     opt = parse_opt()
-    # mlflow_data=''
     with open(opt.mlflow_file, 'r') as f:
         mlflow_data = f.read()
     mlflow_settings_dict = json.loads(mlflow_data)
