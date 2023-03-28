@@ -1052,10 +1052,6 @@ def run(**kwargs):
     return opt
 
 
-
-
-
-
 if __name__ == "__main__":
     opt = parse_opt()
     with open(opt.mlflow_file, 'r') as f:
@@ -1064,6 +1060,6 @@ if __name__ == "__main__":
     run_id = mlflow_settings_dict['run_id']
     mlflow_uri = mlflow_settings_dict['mlflow_uri']
     mlflow.set_tracking_uri(mlflow_uri)
-    with mlflow.start_run():
+    with mlflow.start_run(run_id=run_id):
         main(opt)
 
