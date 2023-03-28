@@ -1069,7 +1069,8 @@ if __name__ == "__main__":
     mlflow.set_tracking_uri(mlflow_uri)
     # experiment = mlflow_data['experiment_name']
     # run_id=mlflow_data['run_id']
-    with mlflow.start_run(run_id=run_id):
+    #with mlflow.start_run(run_id=run_id):
+    with mlflow.start_run():
         main(opt)
     # mlflow.end_run()
 
