@@ -629,8 +629,6 @@ def train(hyp, opt, device, callbacks):
                     callbacks.run(
                         "on_model_save", last, epoch, final_epoch, best_fitness, fi
                     )
-                    # print("Path Object>>>>>>>>>>>>>>>>>>>>>>")
-                    # print(w)
                     # mlflow.log_artifact(w)
 
             # EarlyStopping
@@ -1067,10 +1065,7 @@ if __name__ == "__main__":
     run_id = mlflow_settings_dict['run_id']
     mlflow_uri = mlflow_settings_dict['mlflow_uri']
     mlflow.set_tracking_uri(mlflow_uri)
-    # experiment = mlflow_data['experiment_name']
-    # run_id=mlflow_data['run_id']
     #with mlflow.start_run(run_id=run_id):
     with mlflow.start_run():
         main(opt)
-    # mlflow.end_run()
 
