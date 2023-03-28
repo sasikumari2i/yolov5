@@ -1,0 +1,9 @@
+download: https://ultralytics.com/assets/coco128.zip
+names:
+  0: Supply Line
+  1: Shut Off Valve
+  2: Toilet Coupler
+  3: Toilet Tank Bolt
+path: //home/sasikumar//
+train: images/train
+val: images/val
