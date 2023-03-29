@@ -1061,5 +1061,6 @@ if __name__ == "__main__":
     mlflow_uri = mlflow_settings_dict['mlflow_uri']
     mlflow.set_tracking_uri(mlflow_uri)
     with mlflow.start_run(run_id=run_id):
+    with mlflow.start_run():
         main(opt)
 
