@@ -212,7 +212,7 @@ class ConfusionMatrix:
         ax.set_ylabel('Predicted')
         ax.set_title('Confusion Matrix')
         fig.savefig(Path(save_dir) / 'confusion_matrix.png', dpi=250)
-        mlflow.log_artifact(Path(save_dir) / 'detector_confuison_matrix.png', artifact_path='plots')
+        mlflow.log_artifact(Path(save_dir) / 'confusion_matrix.png', artifact_path='plots')
         plt.close(fig)
 
     def print(self):
