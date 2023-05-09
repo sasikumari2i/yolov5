@@ -25,6 +25,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+import mlflow
 
 import numpy as np
 import torch
@@ -276,6 +277,8 @@ def run(
         tp, fp, p, r, f1, ap, ap_class = ap_per_class(*stats, plot=plots, save_dir=save_dir, names=names)
         ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
         mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
+        mlflow.log_metric('val_metrics/mAP_0.5', map50)
+        mlflow.log_metric('val_metrics/mAP_0.95', map)
     nt = np.bincount(stats[3].astype(int), minlength=nc)  # number of targets per class
 
     # Print results

@@ -1027,7 +1027,7 @@ def main(opt, callbacks=Callbacks()):
                 "metrics/precision",
                 "metrics/recall",
                 "metrics/mAP_0.5",
-                "metrics/mAP_0.5:0.95",
+                "metrics/mAP_0.95",
                 "val/box_loss",
                 "val/obj_loss",
                 "val/cls_loss",
