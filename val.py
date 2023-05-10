@@ -99,6 +99,7 @@ def process_batch(detections, labels, iouv):
 @smart_inference_mode()
 def run(
         data,
+        mlflow_instance,
         weights=None,  # model.pt path(s)
         batch_size=32,  # batch size
         imgsz=640,  # inference size (pixels)
@@ -277,8 +278,8 @@ def run(
         tp, fp, p, r, f1, ap, ap_class = ap_per_class(*stats, plot=plots, save_dir=save_dir, names=names)
         ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
         mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
-        mlflow.log_metric('val_metrics/mAP_0.5', map50)
-        mlflow.log_metric('val_metrics/mAP_0.95', map)
+        mlflow_instance.log_metric('val_metrics/mAP_0.5', map50)
+        mlflow_instance.log_metric('val_metrics/mAP_0.95', map)
     nt = np.bincount(stats[3].astype(int), minlength=nc)  # number of targets per class
 
     # Print results

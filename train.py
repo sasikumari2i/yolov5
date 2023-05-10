@@ -82,7 +82,7 @@ import mlflow
 
 
 
-mlflow.set_tracking_uri ("http://127.0.0.1:5000")
+# mlflow.set_tracking_uri ("http://127.0.0.1:5000")
 tags = [
     "train/box_loss",
     "train/obj_loss",
@@ -106,16 +106,6 @@ LOCAL_RANK = int(
 RANK = int(os.getenv("RANK", -1))
 WORLD_SIZE = int(os.getenv("WORLD_SIZE", 1))
 GIT_INFO = check_git_info()
-
-
-
-
-
-
-
-
-
-
 
 def train(hyp, opt, device, callbacks):
 	 
@@ -580,6 +570,7 @@ def train(hyp, opt, device, callbacks):
                 if not noval or final_epoch:  # Calculate mAP
                     results, maps, _ = validate.run(
                         data_dict,
+                        mlflow,
                         batch_size=batch_size // WORLD_SIZE * 2,
                         imgsz=imgsz,
                         half=amp,
@@ -655,6 +646,7 @@ def train(hyp, opt, device, callbacks):
                         LOGGER.info(f"\nValidating {f}...")
                         results, _, _ = validate.run(
                             data_dict,
+                            mlflow,
                             batch_size=batch_size // WORLD_SIZE * 2,
                             imgsz=imgsz,
                             model=attempt_load(f, device).half(),
